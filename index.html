@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>502教室線上即時選位與核實系統</title>
+    <title>圖502教室線上即時選位與核實系統</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
@@ -34,28 +34,42 @@
 
         .class-info-header { text-align: center; font-size: 27px; font-weight: bold; margin-bottom: 25px; color: #111; word-break: break-all; line-height: 1.4;}
 
-        .stage-area { display: flex; justify-content: center; align-items: center; position: relative; margin: 15px auto 40px auto; max-width: 1250px; }
+        /* 統一置中的滑動容器 */
+        .classroom-grid { 
+            display: block; 
+            overflow-x: auto; 
+            overflow-y: hidden; 
+            -webkit-overflow-scrolling: touch; 
+            padding-bottom: 30px; 
+            margin-top: 10px; 
+            width: 100%; 
+            text-align: center; /* 讓內部的舞台和表格無痛置中，消滅右邊空白 */
+            white-space: nowrap; 
+        }
+
+        /* 講台區塊：設定為 inline-flex 與表格等寬 (1220px) */
+        .stage-area { 
+            display: inline-flex; 
+            justify-content: center; 
+            align-items: center; 
+            position: relative; 
+            margin: 15px auto 30px auto; 
+            width: 1220px; 
+        }
+        
         .stage-box { border: 2px solid var(--border-color); padding: 15px 45px; font-size: 24px; font-weight: bold; background: #f2f2f2; border-radius: 4px; }
+        
+        /* 前門：靠右對齊會剛好落在座位 1-10 的正上方 */
         .front-door { position: absolute; right: 10px; color: #d32f2f; font-size: 24px; font-weight: bold; }
 
-        .classroom-grid { 
-    display: block; 
-    overflow-x: auto; 
-    overflow-y: hidden; 
-    -webkit-overflow-scrolling: touch; /* 啟動手機原生流暢滑動 */
-    padding-bottom: 30px; 
-    margin-top: 10px; 
-    width: 100%; 
-}
-
-        /* 核心修正：502 教室為 10 欄寬，將寬度改為 1250px 確保不變形 */
+        /* 座位表：改為 inline-table 並統一為 1220px 寬度 */
         .seat-table { 
             border-collapse: separate; 
             border-spacing: 6px 8px; 
             table-layout: fixed; 
-            width: 1250px; 
-            min-width: 1250px; 
-            margin: 0; 
+            width: 1220px; 
+            margin: 0 auto; 
+            display: inline-table; 
         }
         
         /* 一般座位統一設定 */
@@ -161,27 +175,23 @@
             .seat-table td.aisle { background: #e2e8f0 !important; border: none; }
         }
 
-        /* 容器設定：開啟左右滑動與流暢慣性 */
-        .main-container {
-            padding: 10px 4px !important;
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch !important; 
-        }
-        
+        /* 導覽與彈出視窗配適 */
         .nav-bar { padding: 12px 8px !important; }
         .nav-bar span { font-size: 18px !important; }
         .nav-btn { font-size: 15px !important; padding: 6px 12px !important; }
 
-        .modal-overlay { zoom: 1 !important; }
-        .modal-body {
-            width: 85% !important;
-            max-width: 360px !important;
-            padding: 20px !important;
+        @media (max-width: 440px) {
+            .modal-overlay { zoom: 1 !important; }
+            .modal-body {
+                width: 85% !important;
+                max-width: 360px !important;
+                padding: 20px !important;
+            }
+            .modal-body h3 { font-size: 22px !important; }
+            #targetSeatLabel { font-size: 24px !important; }
+            .modal-body input { font-size: 18px !important; padding: 8px !important; }
+            .btn { font-size: 18px !important; padding: 8px !important; }
         }
-        .modal-body h3 { font-size: 22px !important; }
-        #targetSeatLabel { font-size: 24px !important; }
-        .modal-body input { font-size: 18px !important; padding: 8px !important; }
-        .btn { font-size: 18px !important; padding: 8px !important; }
 
         .seat-num, .seat-num-empty {
             font-size: 32px !important;
@@ -199,23 +209,23 @@
 <body>
 
     <div class="nav-bar">
-        <span>選位系統 (502教室)</span>
+        <span>選位系統 (圖502教室)</span>
         <button class="nav-btn" id="navToggleBtn" onclick="openLoginModal()">管理後台</button>
     </div>
 
     <div id="studentPage" class="page active">
         <div class="main-container">
             <div class="class-info-header" id="displayClassHeader">
-                502教室線上選位表 (請由管理員自後台載入班期)
+                圖502教室線上選位表 (請由管理員自後台載入班期)
             </div>
             <div class="scroll-hint">⇿ 畫面可左右滑動查看完整座位 ⇿</div>
 
-            <div class="stage-area">
-                <div class="stage-box">講台(白板)</div>
-                <div class="front-door">前門</div>
-            </div>
-
+            <!-- 舞台與座位表合併在同一個容器中置中滑動 -->
             <div class="classroom-grid">
+                <div class="stage-area">
+                    <div class="stage-box">講台(白板)</div>
+                    <div class="front-door">前門</div>
+                </div>
                 <table class="seat-table" id="classroomSeats">
                 </table>
             </div>
@@ -224,7 +234,7 @@
 
     <div id="adminPage" class="page">
         <div class="admin-box">
-            <h3>⚙️ 502教室 - 系統管理後台</h3>
+            <h3>⚙️ 圖502教室 - 系統管理後台</h3>
             
             <button class="btn-admin-act btn-gray" onclick="logoutAdmin()" style="margin-bottom: 25px;">🚪 安全登出</button>
 
@@ -310,9 +320,8 @@
         <div class="modal-body">
             <h3 id="targetSeatLabel" style="margin: 0; color:#333; font-size: 33px;">座位 1-1</h3>
             <div class="modal-notice-box">
-                1.自由入座後，請掃描劃位QRcode，點選座位後輸入正確姓名。<br>
-                2.如要更換座位，請點選原座位取消，再行劃位。<br>
-                3.每節開始上課後10分鐘點名，超過15分鐘未到者須請假1小時。
+                1. 請按照座位表入座，換座位記得改。<br>
+                2. 每節開始上課後10分鐘點名，超過15分鐘未到者須請假1小時。
             </div>
             <p style="font-size: 20px; color: #444; margin: 20px 0 10px 0; font-weight:bold;" id="inputLabelText">請填寫您的真實姓名：</p>
             <input type="text" id="studentName" placeholder="請輸入姓名" autocomplete="off">
@@ -348,7 +357,7 @@
     let dbTitles = JSON.parse(localStorage.getItem("seat_db_titles_502")) || {};
     let dbRosters = JSON.parse(localStorage.getItem("seat_db_rosters_502")) || {};
     
-    let classHeaderTitle = dbTitles[currentClassID] || "502教室線上選位表 (請由管理員自後台載入班期)";
+    let classHeaderTitle = dbTitles[currentClassID] || "圖502教室線上選位表 (請由管理員自後台載入班期)";
     let officialRoster = dbRosters[currentClassID] || [];
     let studentFilledData = {}; 
 
@@ -565,7 +574,7 @@
         const myBookedSeat = localStorage.getItem(`mySeat_502_${currentClassID}`);
         const isBackend = (currentPage === "admin");
 
-        // 502教室：總共 9 排
+        // 圖502教室：總共 9 排
         for (let row = 1; row <= 9; row++) {
             html += "<tr>";
             
@@ -690,7 +699,7 @@
             await fetch(`${FIREBASE_URL}/room502/${currentClassID}/roster.json`, { method: 'PUT', body: JSON.stringify(officialRoster) });
 
             const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
-            alert(`【開班成功】\n502教室班期 ${currentClassID} 已完成建立！\n系統已智能斷點過濾並匯入 ${officialRoster.length} 名學員。`);
+            alert(`【開班成功】\n圖502教室班期 ${currentClassID} 已完成建立！\n系統已智能斷點過濾並匯入 ${officialRoster.length} 名學員。`);
             window.location.replace(`${baseUrl}?class=${currentClassID}`);
 
         } catch (err) { alert("解析錯誤，請確認文字內容。"); }
@@ -829,9 +838,9 @@ function handleSeatClick(seatCode) {
 
         if (!seatId || !studentName) { alert("請輸入座位編號與姓名！"); return; }
         
-        // 502格式驗證：1-1 到 9-10
+        // 圖502格式驗證：1-1 到 9-10
         if (!/^([1-9])-([1-9]|10)$/.test(seatId)) { 
-            alert("座位格式錯誤 (502教室正確為 1-1 到 9-10)！"); 
+            alert("座位格式錯誤 (圖502教室正確為 1-1 到 9-10)！"); 
             return; 
         }
 
