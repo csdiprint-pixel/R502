@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>圖502教室線上即時選位與核實系統</title>
+    <title>502教室線上即時選位與核實系統</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
@@ -205,14 +205,14 @@
 <body>
 
     <div class="nav-bar">
-        <span>選位系統 (圖502教室)</span>
+        <span>選位系統 (502教室)</span>
         <button class="nav-btn" id="navToggleBtn" onclick="openLoginModal()">管理後台</button>
     </div>
 
     <div id="studentPage" class="page active">
         <div class="main-container">
             <div class="class-info-header" id="displayClassHeader">
-                圖502教室線上選位表 (請由管理員自後台載入班期)
+                502教室線上選位表 (請由管理員自後台載入班期)
             </div>
             <div class="scroll-hint">⇿ 畫面可左右滑動查看完整座位 ⇿</div>
 
@@ -230,7 +230,7 @@
 
     <div id="adminPage" class="page">
         <div class="admin-box">
-            <h3>⚙️ 圖502教室 - 系統管理後台</h3>
+            <h3>⚙️ 502教室 - 系統管理後台</h3>
             
             <button class="btn-admin-act btn-gray" onclick="logoutAdmin()" style="margin-bottom: 25px;">🚪 安全登出</button>
 
@@ -353,7 +353,7 @@
     let dbTitles = JSON.parse(localStorage.getItem("seat_db_titles_502")) || {};
     let dbRosters = JSON.parse(localStorage.getItem("seat_db_rosters_502")) || {};
     
-    let classHeaderTitle = dbTitles[currentClassID] || "圖502教室線上選位表 (請由管理員自後台載入班期)";
+    let classHeaderTitle = dbTitles[currentClassID] || "502教室線上選位表 (請由管理員自後台載入班期)";
     let officialRoster = dbRosters[currentClassID] || [];
     let studentFilledData = {}; 
 
@@ -570,7 +570,7 @@
         const myBookedSeat = localStorage.getItem(`mySeat_502_${currentClassID}`);
         const isBackend = (currentPage === "admin");
 
-        // 圖502教室：總共 9 排
+        // 502教室：總共 9 排
         for (let row = 1; row <= 9; row++) {
             html += "<tr>";
             
@@ -695,7 +695,7 @@
             await fetch(`${FIREBASE_URL}/room502/${currentClassID}/roster.json`, { method: 'PUT', body: JSON.stringify(officialRoster) });
 
             const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
-            alert(`【開班成功】\n圖502教室班期 ${currentClassID} 已完成建立！\n系統已智能斷點過濾並匯入 ${officialRoster.length} 名學員。`);
+            alert(`【開班成功】\n502教室班期 ${currentClassID} 已完成建立！\n系統已智能斷點過濾並匯入 ${officialRoster.length} 名學員。`);
             window.location.replace(`${baseUrl}?class=${currentClassID}`);
 
         } catch (err) { alert("解析錯誤，請確認文字內容。"); }
@@ -834,9 +834,9 @@ function handleSeatClick(seatCode) {
 
         if (!seatId || !studentName) { alert("請輸入座位編號與姓名！"); return; }
         
-        // 圖502格式驗證：1-1 到 9-10
+        // 502格式驗證：1-1 到 9-10
         if (!/^([1-9])-([1-9]|10)$/.test(seatId)) { 
-            alert("座位格式錯誤 (圖502教室正確為 1-1 到 9-10)！"); 
+            alert("座位格式錯誤 (502教室正確為 1-1 到 9-10)！"); 
             return; 
         }
 
