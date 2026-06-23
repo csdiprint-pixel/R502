@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>502教室線上即時選位與核實系統</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
@@ -38,7 +38,15 @@
         .stage-box { border: 2px solid var(--border-color); padding: 15px 45px; font-size: 24px; font-weight: bold; background: #f2f2f2; border-radius: 4px; }
         .front-door { position: absolute; right: 10px; color: #d32f2f; font-size: 24px; font-weight: bold; }
 
-        .classroom-grid { display: flex; justify-content: center; align-items: stretch; overflow-x: auto; padding-bottom: 30px; margin-top: 10px; }
+        .classroom-grid { 
+    display: block; 
+    overflow-x: auto; 
+    overflow-y: hidden; 
+    -webkit-overflow-scrolling: touch; /* 啟動手機原生流暢滑動 */
+    padding-bottom: 30px; 
+    margin-top: 10px; 
+    width: 100%; 
+}
 
         /* 核心修正：502 教室為 10 欄寬，將寬度改為 1250px 確保不變形 */
         .seat-table { 
@@ -151,20 +159,6 @@
             .main-container { box-shadow: none; padding: 0; margin: 0; }
             .seat-table td { -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: 16px; width: 80px; height: 60px;}
             .seat-table td.aisle { background: #e2e8f0 !important; border: none; }
-        }
-
-        /* 手機螢幕等比例縮放配適 */
-        @media (max-width: 375px) {
-            .classroom-grid, .stage-area { zoom: 0.32 !important; }
-        }
-        @media (min-width: 376px) and (max-width: 414px) {
-            .classroom-grid, .stage-area { zoom: 0.35 !important; }
-        }
-        @media (min-width: 415px) and (max-width: 440px) {
-            .classroom-grid, .stage-area { zoom: 0.38 !important; }
-        }
-        @media (min-width: 441px) and (max-width: 768px) {
-            .classroom-grid, .stage-area { zoom: 0.55 !important; }
         }
 
         /* 容器設定：開啟左右滑動與流暢慣性 */
