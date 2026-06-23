@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>圖502教室線上即時選位與核實系統</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
@@ -34,42 +34,20 @@
 
         .class-info-header { text-align: center; font-size: 27px; font-weight: bold; margin-bottom: 25px; color: #111; word-break: break-all; line-height: 1.4;}
 
-        /* 統一置中的滑動容器 */
-        .classroom-grid { 
-            display: block; 
-            overflow-x: auto; 
-            overflow-y: hidden; 
-            -webkit-overflow-scrolling: touch; 
-            padding-bottom: 30px; 
-            margin-top: 10px; 
-            width: 100%; 
-            text-align: center; /* 讓內部的舞台和表格無痛置中，消滅右邊空白 */
-            white-space: nowrap; 
-        }
-
-        /* 講台區塊：設定為 inline-flex 與表格等寬 (1220px) */
-        .stage-area { 
-            display: inline-flex; 
-            justify-content: center; 
-            align-items: center; 
-            position: relative; 
-            margin: 15px auto 30px auto; 
-            width: 1220px; 
-        }
-        
+        .stage-area { display: flex; justify-content: center; align-items: center; position: relative; margin: 15px auto 40px auto; max-width: 1250px; }
         .stage-box { border: 2px solid var(--border-color); padding: 15px 45px; font-size: 24px; font-weight: bold; background: #f2f2f2; border-radius: 4px; }
-        
-        /* 前門：靠右對齊會剛好落在座位 1-10 的正上方 */
         .front-door { position: absolute; right: 10px; color: #d32f2f; font-size: 24px; font-weight: bold; }
 
-        /* 座位表：改為 inline-table 並統一為 1220px 寬度 */
+        .classroom-grid { display: flex; justify-content: center; align-items: stretch; overflow-x: auto; padding-bottom: 30px; margin-top: 10px; }
+
+        /* 核心修正：502 教室為 10 欄寬，將寬度改為 1250px 確保不變形 */
         .seat-table { 
             border-collapse: separate; 
             border-spacing: 6px 8px; 
             table-layout: fixed; 
-            width: 1220px; 
-            margin: 0 auto; 
-            display: inline-table; 
+            width: 1250px; 
+            min-width: 1250px; 
+            margin: 0; 
         }
         
         /* 一般座位統一設定 */
@@ -175,23 +153,41 @@
             .seat-table td.aisle { background: #e2e8f0 !important; border: none; }
         }
 
-        /* 導覽與彈出視窗配適 */
+        /* 手機螢幕等比例縮放配適 */
+        @media (max-width: 375px) {
+            .classroom-grid, .stage-area { zoom: 0.32 !important; }
+        }
+        @media (min-width: 376px) and (max-width: 414px) {
+            .classroom-grid, .stage-area { zoom: 0.35 !important; }
+        }
+        @media (min-width: 415px) and (max-width: 440px) {
+            .classroom-grid, .stage-area { zoom: 0.38 !important; }
+        }
+        @media (min-width: 441px) and (max-width: 768px) {
+            .classroom-grid, .stage-area { zoom: 0.55 !important; }
+        }
+
+        /* 容器設定：開啟左右滑動與流暢慣性 */
+        .main-container {
+            padding: 10px 4px !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important; 
+        }
+        
         .nav-bar { padding: 12px 8px !important; }
         .nav-bar span { font-size: 18px !important; }
         .nav-btn { font-size: 15px !important; padding: 6px 12px !important; }
 
-        @media (max-width: 440px) {
-            .modal-overlay { zoom: 1 !important; }
-            .modal-body {
-                width: 85% !important;
-                max-width: 360px !important;
-                padding: 20px !important;
-            }
-            .modal-body h3 { font-size: 22px !important; }
-            #targetSeatLabel { font-size: 24px !important; }
-            .modal-body input { font-size: 18px !important; padding: 8px !important; }
-            .btn { font-size: 18px !important; padding: 8px !important; }
+        .modal-overlay { zoom: 1 !important; }
+        .modal-body {
+            width: 85% !important;
+            max-width: 360px !important;
+            padding: 20px !important;
         }
+        .modal-body h3 { font-size: 22px !important; }
+        #targetSeatLabel { font-size: 24px !important; }
+        .modal-body input { font-size: 18px !important; padding: 8px !important; }
+        .btn { font-size: 18px !important; padding: 8px !important; }
 
         .seat-num, .seat-num-empty {
             font-size: 32px !important;
@@ -220,12 +216,12 @@
             </div>
             <div class="scroll-hint">⇿ 畫面可左右滑動查看完整座位 ⇿</div>
 
-            <!-- 舞台與座位表合併在同一個容器中置中滑動 -->
+            <div class="stage-area">
+                <div class="stage-box">講台(白板)</div>
+                <div class="front-door">前門</div>
+            </div>
+
             <div class="classroom-grid">
-                <div class="stage-area">
-                    <div class="stage-box">講台(白板)</div>
-                    <div class="front-door">前門</div>
-                </div>
                 <table class="seat-table" id="classroomSeats">
                 </table>
             </div>
@@ -651,8 +647,11 @@
             currentClassID = classCode;
             classHeaderTitle = `${classCode}${className}-${formattedDate}`;
 
-            const nameSet = new Set();
-            const nameRegex = /^[\u4e00-\u9fa5]{2,4}$/; 
+            // 修改點 1：改用陣列 (Array) 儲存，這樣「小叮噹」出現幾次就會抓幾次
+            const extractedNames = [];
+            
+            // 修改點 2：放寬判斷條件，支援 2~8 個字，且允許括號、符號等格式
+            const nameRegex = /^(?=.*[\u4e00-\u9fa5a-zA-Z0-9]).{2,8}$/;
             
             const excludeHeaders = ["姓名", "座號", "機關", "機關學校", "職稱", "單位", "備註", "受訓日期", "簽到", "備註欄", "報到簽名", "簽到欄"];
             const tokens = text.split(/[\s\t\n\r,，、]+/);
@@ -666,7 +665,7 @@
                     if (buffer.length > 0) {
                         const possibleName = buffer[buffer.length - 1];
                         if (nameRegex.test(possibleName) && !excludeHeaders.includes(possibleName)) {
-                            nameSet.add(possibleName);
+                            extractedNames.push(possibleName);
                         }
                     }
                     buffer = []; 
@@ -678,11 +677,11 @@
             if (buffer.length > 0) {
                 const possibleName = buffer[buffer.length - 1];
                 if (nameRegex.test(possibleName) && !excludeHeaders.includes(possibleName)) {
-                    nameSet.add(possibleName);
+                    extractedNames.push(possibleName);
                 }
             }
 
-            officialRoster = Array.from(nameSet);
+            officialRoster = extractedNames;
 
             if (officialRoster.length === 0) {
                 alert("警告：未抓取到任何有效姓名！請確認貼上的文字包含學員姓名。");
@@ -699,12 +698,11 @@
             await fetch(`${FIREBASE_URL}/room502/${currentClassID}/roster.json`, { method: 'PUT', body: JSON.stringify(officialRoster) });
 
             const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
-            alert(`【開班成功】\n圖502教室班期 ${currentClassID} 已完成建立！\n系統已智能斷點過濾並匯入 ${officialRoster.length} 名學員。`);
+            alert(`【開班成功】\n圖502教室班期 ${currentClassID} 已完成建立！\n系統已抓取 ${officialRoster.length} 名學員（已支援同名同姓）。`);
             window.location.replace(`${baseUrl}?class=${currentClassID}`);
 
         } catch (err) { alert("解析錯誤，請確認文字內容。"); }
     }
-
     function generateClassQRCode(classId) {
         if(!classId) return;
         const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
@@ -890,12 +888,20 @@ function handleSeatClick(seatCode) {
         let matchCount = 0;
         let errorNames = [];
 
+        // 修改點 3：複製一份名單進行「消去法」，完美核實同名同姓的數量
+        let rosterCheckList = [...officialRoster];
+
         filledNames.forEach(name => {
-            if (officialRoster.includes(name)) matchCount++;
-            else errorNames.push(name);
+            const idx = rosterCheckList.indexOf(name);
+            if (idx !== -1) {
+                matchCount++;
+                rosterCheckList.splice(idx, 1); // 核對成功就從清單中劃掉一位
+            } else {
+                errorNames.push(name);
+            }
         });
 
-        const missingStudents = officialRoster.filter(name => !filledNames.includes(name));
+        const missingStudents = rosterCheckList; // 剩下沒被劃掉的即為缺席
         const report = document.getElementById("adminReport");
         report.style.display = "block";
         report.innerHTML = `
